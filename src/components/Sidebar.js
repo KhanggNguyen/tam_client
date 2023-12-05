@@ -59,9 +59,9 @@ export const Sidebar = () => {
     return (
         <div className="sidebar" data-testid="sidebar">
             <ul className="sidebar__generic">
-                {lines.map((line) => (
+                {lines.map((line, index) => (
                     <li
-                        key={line.name}
+                        key={index}
                         data-testid={line.name}
                         className={active === line.name ? "active" : undefined}
                         style={{ backgroundColor: line.backgroundColor }}

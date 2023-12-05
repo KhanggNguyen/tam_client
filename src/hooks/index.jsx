@@ -13,7 +13,8 @@ import {
     Fa9,
 } from "react-icons/fa6";
 
-const TAM_DATA_ENDPOINT = "http://localhost:5000";
+// const TAM_DATA_ENDPOINT = "http://localhost:5000";
+const TAM_DATA_ENDPOINT = "https://tam-api.onrender.com";
 const TAM_API_ENDPOINT = "https://montpellier-tam-api.vercel.app/api/query?";
 
 const icons = {
@@ -29,6 +30,15 @@ const icons = {
     9: <Fa9 style={{ color: "#FFFFFF" }} />,
 };
 
+const groupBy = (items, key) =>
+    items.reduce(
+        (result, item) => ({
+            ...result,
+            [item[key]]: [...(result[item[key]] || []), item],
+        }),
+        {}
+    );
+
 export const useRouteName = ({ route_short_name }) => {
     const [data, setData] = useState([]);
 
@@ -41,34 +51,35 @@ export const useRouteName = ({ route_short_name }) => {
                 let URL = TAM_DATA_ENDPOINT + "?" + queries.join("&");
 
                 const res = await (await fetch(URL)).json();
-                const resTripHeadSign = Object.groupBy(
-                    res,
-                    ({ trip_headsign, stop_id, route_short_name }, index) => {
-                        if (route_short_name === "4") {
-                            if (index % 2 === 0) {
-                                return `${trip_headsign} A`;
-                            } else {
-                                return `${trip_headsign} B`;
-                            }
-                        } else {
-                            return trip_headsign;
-                        }
-                    }
-                );
 
+                //group by direction
+                const resTripHeadSign = groupBy(res, "trip_headsign");
+
+                //group by stop
                 Object.keys(resTripHeadSign).forEach((key) => {
-                    resTripHeadSign[key] = Object.groupBy(
+                    resTripHeadSign[key] = groupBy(
                         resTripHeadSign[key],
-                        ({ stop_name }) => stop_name
+                        "stop_name"
                     );
                 });
 
+                //
                 Object.keys(resTripHeadSign).forEach((key) => {
                     resTripHeadSign[key] = Object.fromEntries(
                         Object.entries(resTripHeadSign[key]).sort(
                             ([, a], [, b]) => a[0].stop_id - b[0].stop_id
                         )
                     );
+                });
+
+                // sort by wait time
+                Object.keys(resTripHeadSign).forEach((key) => {
+                    Object.keys(resTripHeadSign[key]).forEach((stopKey) => {
+                        resTripHeadSign[key][stopKey].sort(
+                            (a, b) =>
+                                parseInt(a.delay_sec) - parseInt(b.delay_sec)
+                        );
+                    });
                 });
 
                 setData(resTripHeadSign);
