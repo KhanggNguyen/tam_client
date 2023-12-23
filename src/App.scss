@@ -396,7 +396,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-
+    flex-direction: column;
     .loading-spinner {
         width: 50px;
         height: 50px;
@@ -404,5 +404,9 @@ header {
         border-top: 10px solid #383636; /* Black */
         border-radius: 50%;
         animation: spinner 1.5s linear infinite;
+    }
+
+    .loading-message{
+        font-family: "Roboto", sans-serif;
     }
 }
