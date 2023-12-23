@@ -43,7 +43,7 @@ export const Body = () => {
                 <h2 data-testid="title" className="heading-title">
                     {`Ligne ${searchParams.get("route_short_name") || 1}`}
                 </h2>
-                <div class="input-container">
+                <div className="input-container">
                     <input
                         type="search"
                         name="search"
