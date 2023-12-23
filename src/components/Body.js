@@ -1,12 +1,13 @@
 import { useSearchParams } from "react-router-dom";
-
 import { useRouteName } from "../hooks";
 import { useEffect, useState } from "react";
+import { Spinner } from "./Spinner";
+
 export const Body = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [filteredData, setFilteredData] = useState({});
     const [searchValue, setSearchValue] = useState("");
-    const { data } = useRouteName({
+    const { data, isLoading } = useRouteName({
         route_short_name: searchParams.get("route_short_name") || 1,
     });
 
@@ -38,25 +39,33 @@ export const Body = () => {
 
     return (
         <div className="line" data-testid="line">
-            <h2 data-testid="project-name">
-                {`Ligne ${searchParams.get("route_short_name") || 1}`}
-            </h2>
-            <input
-                type="search"
-                name="search"
-                onChange={handleSearch}
-                placeholder="Saisir une station"
-            />
+            <div className="heading-container">
+                <h2 data-testid="title" className="heading-title">
+                    {`Ligne ${searchParams.get("route_short_name") || 1}`}
+                </h2>
+                <div class="input-container">
+                    <input
+                        type="search"
+                        name="search"
+                        onChange={handleSearch}
+                        placeholder="Saisir une station"
+                    />
+                </div>
+            </div>
             <div className="line__trip_headingsign">
-                {Object.keys(filteredData).map((trip_headsignKey) => (
-                    <div
-                        key={trip_headsignKey}
-                        className="line__trip_headingsign__container"
-                    >
-                        <h3>Vers {trip_headsignKey}</h3>
-                        <ul className="line__trip_headingsign__container__stops">
-                            {Object.keys(filteredData[trip_headsignKey]).map(
-                                (stopKey) => (
+                {isLoading ? (
+                    <Spinner />
+                ) : (
+                    Object.keys(filteredData).map((trip_headsignKey) => (
+                        <div
+                            key={trip_headsignKey}
+                            className="line__trip_headingsign__container"
+                        >
+                            <h3>Vers {trip_headsignKey}</h3>
+                            <ul className="line__trip_headingsign__container__stops">
+                                {Object.keys(
+                                    filteredData[trip_headsignKey]
+                                ).map((stopKey) => (
                                     <li key={trip_headsignKey + stopKey}>
                                         <div>{stopKey}</div>
                                         <div>
@@ -78,11 +87,11 @@ export const Body = () => {
                                             })}
                                         </div>
                                     </li>
-                                )
-                            )}
-                        </ul>
-                    </div>
-                ))}
+                                ))}
+                            </ul>
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );

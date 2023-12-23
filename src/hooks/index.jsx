@@ -41,10 +41,12 @@ const groupBy = (items, key) =>
 
 export const useRouteName = ({ route_short_name }) => {
     const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchAndFilter = async (filters) => {
             try {
+                setIsLoading(true);
                 const queries = Object.keys(filters).map((key) => {
                     return `${key}=${filters[key]}`;
                 });
@@ -83,6 +85,7 @@ export const useRouteName = ({ route_short_name }) => {
                 });
 
                 setData(resTripHeadSign);
+                setIsLoading(false);
                 return resTripHeadSign;
             } catch (err) {
                 console.error(err);
@@ -92,15 +95,17 @@ export const useRouteName = ({ route_short_name }) => {
         fetchAndFilter({ route_short_name });
     }, [route_short_name]);
 
-    return { data };
+    return { data, isLoading };
 };
 
 export const useLines = () => {
     const [lines, setLines] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchLines = async () => {
             try {
+                setIsLoading(true);
                 let URL = `${TAM_DATA_ENDPOINT}/lines`;
 
                 const res = (await (await fetch(URL)).json()).map((line) => {
@@ -141,6 +146,7 @@ export const useLines = () => {
                     }
                 });
                 setLines(res);
+                setIsLoading(false);
                 return res;
             } catch (err) {
                 console.error(err);
@@ -150,5 +156,5 @@ export const useLines = () => {
         fetchLines();
     }, []);
 
-    return { lines };
+    return { lines, isLoading };
 };
